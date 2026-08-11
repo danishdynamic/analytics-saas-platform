@@ -1,6 +1,8 @@
 # Analytics SaaS Backend API
 
-A production-ready FastAPI backend scaffold for an analytics SaaS application.
+> A production ready FastAPI backend scaffold for an analytics SaaS application.
+
+---
 
 ## Overview
 
@@ -138,4 +140,3 @@ Feel free to extend the API with:
 - billing subscription management
 - notification queuing and delivery
 - analytics event ingestion endpoints
-- production-ready deployment configuration
