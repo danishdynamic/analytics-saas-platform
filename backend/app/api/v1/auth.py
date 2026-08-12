@@ -4,7 +4,7 @@ from app.schemas.user import UserCreate, UserLogin
 from app.schemas.token import Token, TokenRefresh
 from app.services.auth_service import AuthService
 from app.db.database import get_db
-from app.core.security import decode_token, create_access_token
+from app.core.security import decode_token, create_access_token, create_refresh_token
 from app.db.redis_client import blacklist_token, is_token_blacklisted
 from jose import JWTError
 
