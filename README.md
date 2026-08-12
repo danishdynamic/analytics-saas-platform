@@ -1,142 +1,214 @@
-# Analytics SaaS Backend API
+# 🚀 Full Stack Analytics SaaS & E-Commerce Platform
 
-> A production ready FastAPI backend scaffold for an analytics SaaS application.
+> A production grade, full stack monorepo featuring a high performance FastAPI backend coupled with a modern React + Vite frontend. Built for real time analytics tracking, background job processing, and scalable e commerce workflows.
 
 ---
 
-## Overview
+## 🛠️ Tech Stack & Shields
 
-This repository contains a modular backend service built with:
+### Backend
 
-- **FastAPI** for HTTP APIs
-- **SQLAlchemy** for ORM models and PostgreSQL integration
-- **Alembic** for database migrations
-- **Celery** + **RabbitMQ** for background task processing
-- **Redis** for caching or Celery results
-- **PyTest** for tests
+| Layer | Technology | Badge | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Framework** | FastAPI | ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) | Async REST API & OpenAPI docs |
+| **Database** | PostgreSQL | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white) | Relational primary data store |
+| **Pooler** | PgBouncer | ![PgBouncer](https://img.shields.io/badge/PgBouncer-336791?style=flat-square&logo=postgresql&logoColor=white) | Connection pooling |
+| **Cache & Auth** | Redis | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) | JWT blacklist & caching |
+| **Task Queue** | Celery | ![Celery](https://img.shields.io/badge/Celery-37814D?style=flat-square&logo=celery&logoColor=white) | Asynchronous background jobs |
+| **Broker** | RabbitMQ | ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=flat-square&logo=rabbitmq&logoColor=white) | Message broker for Celery |
+| **DevOps** | Docker | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | Service containerization |
 
-The project is designed for a versioned API structure, clean separation between API, services, models, and worker logic, and Docker-based local development.
+### Frontend
 
-## Key features
+| Layer | Technology | Badge | Purpose |
+| :--- | :--- | :--- | :--- |
+| **UI Library** | React 18 | ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black) | Declarative UI views |
+| **Build Tool** | Vite | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white) | Dev server & production bundler |
+| **Styling** | Tailwind + DaisyUI | ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) | Utility-first styling & UI components |
+| **Data Fetching**| TanStack Query | ![React Query](https://img.shields.io/badge/React_Query-FF4154?style=flat-square&logo=react-query&logoColor=white) | Server state management & caching |
+| **State** | Zustand | ![Zustand](https://img.shields.io/badge/Zustand-443E38?style=flat-square&logo=react&logoColor=white) | Client state (Auth, Cart) |
+| **HTTP Client** | Axios | ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat-square&logo=axios&logoColor=white) | API calls & auth interceptors |
+| **Charts** | Recharts | ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=flat-square&logo=chartdotjs&logoColor=white) | Analytics visualizations |
 
-- API versioning under `app/api/v1`
-- Pydantic schemas for request/response validation
-- SQLAlchemy relationships and join-ready models
-- Postgres-backed persistence
-- Background task queue support via Celery/RabbitMQ
-- Alembic migrations for schema changes
+---
 
-## Repository structure
+## 🏗️ System Architecture
 
-- `app/`
-  - `main.py` - FastAPI application entrypoint
-  - `api/v1/` - versioned REST routers
-  - `core/` - configuration, security, and JWT helpers
-  - `db/` - database session and initialization logic
-  - `models/` - SQLAlchemy models with relationships
-  - `schemas/` - request/response Pydantic models
-  - `services/` - business logic layer
-  - `worker/` - Celery worker configuration
-- `migrations/` - Alembic migration environment and revision scripts
-- `tests/` - integration and unit tests
-- `Dockerfile` - image build instructions
-- `docker-compose.yml` - full local stack with Postgres, RabbitMQ, Redis, web, and worker
 
-## Prerequisites
+```mermaid
+graph TD
+    subgraph Frontend Layer
+        FE[💻 React + Vite App]
+        RQ[🔄 React Query / Axios]
+        ZS[⚡ Zustand Global Stores]
+        FE --- RQ
+        FE --- ZS
+    end
 
-- Python 3.11+ or 3.12
-- Docker and Docker Compose
+    subgraph API Layer
+        API[⚡ FastAPI Web Server]
+    end
 
-## Local development
+    subgraph Cache & Token Blacklist
+        REDIS[(🔴 Redis)]
+    end
 
-1. Create and activate a virtual environment:
+    subgraph Database Layer
+        PGB[🔌 PgBouncer :6432]
+        DB[(🐘 PostgreSQL :5432)]
+    end
 
-   ```bash
-   python -m venv venv
-   .venv\Scripts\activate
-   ```
+    subgraph Asynchronous Task Queue
+        RMQ[🐇 RabbitMQ Broker]
+        CELERY[🥬 Celery Worker]
+    end
 
-2. Install dependencies:
+    FE -->|HTTP / REST API| API
+    API -->|Session / Token Revocation| REDIS
+    API -->|SQL Queries| PGB
+    PGB -->|Connection Pooling| DB
+    API -->|Dispatch Background Tasks| RMQ
+    RMQ -->|Consume Messages| CELERY
+    CELERY -->|Update Execution Status| DB
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-3. Copy, review, or update `.env` values if needed:
+## ✨ Key Features & Implementation
 
-   ```env
-   DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/saas
-   SECRET_KEY=supersecret
-   ACCESS_TOKEN_EXPIRE_MINUTES=30
-   CELERY_BROKER_URL=amqp://guest:guest@rabbitmq//
-   REDIS_URL=redis://redis:6379/0
-   ```
+| Feature|Implementation|Tech Used|
+--- | --- |  --- |
+Authentication| Registration, Login, JWT Access/Refresh tokens, Redis blacklist logout | FastAPI, Redis, Axios Interceptors, Zustand |
+Notifications | Create order → Queue Celery task → Simulate dispatch → Update live UI | Celery, RabbitMQ, PostgreSQL, React Query |
+Event Ingestion | Ingest custom analytics (authenticated/anonymous) by user & type | FastAPI, SQLAlchemy, useAnalytics Hook |
+Analytics Dashboard | Real time aggregate statistics: total, daily, and weekly metric charts | Recharts, FastAPI, PostgreSQL |
+E-Commerce & Orders | Product catalog, cart management, simulated payment, order creation | DaisyUI, Tailwind, Zustand, React Query |
+Billing Management | Secure user subscription details and historical billing records | FastAPI, PostgreSQL, Protected Routes |
 
-4. Start the application directly:
+---
 
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+## 📁 Repository Structure
 
-5. Open the API docs:
+```Plaintext
+.
+├── backend/
+│   ├── app/
+│   │   ├── main.py                   # FastAPI initialization & route mounting
+│   │   ├── api/v1/                   # Endpoint routers (auth, orders, events, etc.)
+│   │   ├── core/                     # Security, config, and dependencies
+│   │   ├── db/                       # Engine, session setup & Redis client
+│   │   ├── models/                   # SQLAlchemy models
+│   │   ├── schemas/                  # Pydantic validation schemas
+│   │   ├── services/                 # Core business logic layer
+│   │   └── worker/                   # Celery app & background task definitions
+│   ├── tests/                        # Pytest suite
+│   ├── migrations/                   # Alembic database revisions
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+└── frontend/
+    ├── package.json
+    ├── vite.config.js
+    ├── tailwind.config.js
+    ├── postcss.config.js
+    ├── index.html
+    └── src/
+        ├── main.jsx                  # Application entry point
+        ├── App.jsx                   # Router setup & global providers
+        ├── api/                      # Axios HTTP modules per feature
+        ├── store/                    # Zustand stores (authStore, cartStore, etc.)
+        ├── hooks/                    # Custom React Query hooks
+        ├── components/               # Reusable UI components
+        └── pages/                    # Route pages (Shop, Cart, Dashboard, etc.)
+```
 
-   - `http://127.0.0.1:8000/docs`
-   - `http://127.0.0.1:8000/redoc`
+---
 
-## Docker Compose
+## 🔌 Environment Variables
 
-Launch the full stack:
+**Backend** ```(backend/.env)```
 
-```bash
+Variable | Description | Default |
+--- | --- | --- | 
+DATABASE_URL | PostgreSQL connection string | postgresql+psycopg2://postgres:postgres@db:5432/saas |
+SECRET_KEY | HMAC key for signing JWTs | supersecret | 
+ACCESS_TOKEN_EXPIRE_MINUTES| Access Token TTL | 15 |
+REFRESH_TOKEN_EXPIRE_DAYS| Refresh Token TTL| 7 | 
+CELERY_BROKER_URL| RabbitMQ connection URL| amqp://guest:guest@rabbitmq//|
+REDIS_URL | Redis connection URL| redis://redis:6379/0|
+
+
+**Frontend** ```(frontend/.env)```
+
+Variable| Description | Default |
+--- | --- | --- |
+VITE_API_BASE_URL | Backend REST API endpoint | http://localhost:8000/api/v1 | 
+
+---
+
+## ⚡ Getting Started
+
+### 🐳 Option 1: Docker Compose (Entire Stack)
+
+Spin up all backend services (FastAPI, Postgres, PgBouncer, Redis, RabbitMQ, Celery) along with the frontend in a single command:
+
+```Bash
 docker compose up --build
 ```
 
-Stop the stack:
+Access the applications:
 
-```bash
-docker compose down
-```
+- **Frontend Application**: ```http://localhost:5173```
 
-If you need a shell in the web container:
+- **API Documentation (Swagger UI)**: ```http://localhost:8000/docs```
 
-```bash
-docker compose exec web sh
-```
+- **API Documentation (ReDoc)**: ```http://localhost:8000/redoc```
 
-## Database migrations
+### 💻 Option 2: Local Manual Setup
 
-Initialize or apply migrations:
+1. Backend Setup
 
-```bash
+```Bash
+cd backend
+
+# Create & activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+
+# Run database migrations
 alembic upgrade head
+
+# Start local server
+uvicorn app.main:app --reload
 ```
 
-Generate a new migration after model changes:
+2. Frontend Setup
+   
+```Bash
+cd frontend
 
-```bash
-alembic revision --autogenerate -m "describe changes"
-alembic upgrade head
+# Install dependencies
+npm install react react-dom react-router-dom zustand axios @tanstack/react-query recharts lucide-react
+npm install -D vite @vitejs/plugin-react tailwindcss postcss autoprefixer daisyui@latest @types/react @types/react-dom
+
+# Configure environment
+cp .env.example .env
+
+# Run development server
+npm run dev
 ```
 
-## Testing
+### 🧪 Testing
 
-Run the test suite:
+Run backend test suites using pytest:
 
-```bash
+```Bash
+cd backend
 pytest
 ```
-
-## Notes
-
-- The current backend includes starter authentication, billing, health, and notification modules.
-- Models are designed for relational joins, with `User`, `Billing`, and `Notification` relationships configured.
-- Celery is configured for future background task processing via `app.worker.celery_app`.
-
-## Contribution
-
-Feel free to extend the API with:
-
-- authentication flows and token handling
-- billing subscription management
-- notification queuing and delivery
-- analytics event ingestion endpoints
