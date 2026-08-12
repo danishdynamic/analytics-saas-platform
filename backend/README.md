@@ -233,17 +233,18 @@ pytest
 
 ## 📌 API Routes Overview
 
-Category,Method,Endpoint,Description,Auth Required
-Auth,POST,/api/v1/auth/signup,Register new user account,❌ No
-Auth,POST,/api/v1/auth/login,Authenticate user & get access/refresh tokens,❌ No
-Auth,POST,/api/v1/auth/logout,Revoke tokens (adds access token to Redis blacklist),🔑 Yes
-Orders,POST,/api/v1/orders,Create an order and queue a notification event,🔑 Yes
-Notifications,GET,/api/v1/notifications,Fetch user notification status history,🔑 Yes
-Events,POST,/api/v1/events/ingest,Ingest platform usage/user events,⚡ Optional
-Events,GET,/api/v1/events,Query ingested events by type or user,🔑 Yes
-Analytics,GET,/api/v1/analytics/dashboard,Aggregated dashboard stats & metrics,🔑 Yes
-Billing,GET,/api/v1/billing,Retrieve user billing history,🔑 Yes
-System,GET,/health,Check API service health,❌ No
+Category| Method | Endpoint | Description | Auth Required |
+--- | --- | --- | --- | --- |
+Auth | POST | /api/v1/auth/signup | Register new user account | ❌ No |
+Auth | POST | /api/v1/auth/login | Authenticate user & get access/refresh tokens | ❌ No |
+Auth | POST |/api/v1/auth/logout | Revoke tokens (adds access token to Redis blacklist) | 🔑 Yes |
+Orders | POST| /api/v1/orders | Create an order and queue a notification event |🔑 Yes |
+Notifications |GET|/api/v1/notifications |Fetch user notification status history | 🔑 Yes |
+Events |POST |/api/v1/events/ingest |Ingest platform usage/user events |⚡ Optional |
+Events |GET |/api/v1/events |Query ingested events by type or user |🔑 Yes |
+Analytics | GET | /api/v1/analytics/dashboard | Aggregated dashboard stats & metrics | 🔑 Yes |
+Billing | GET | /api/v1/billing | Retrieve user billing history | 🔑 Yes |
+System |GET |/health | Check API service health | ❌ No |
 
 ---
 
