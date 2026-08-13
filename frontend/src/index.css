@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+/* DaisyUI theme config goes here in CSS */
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+/* Your custom styles */
+body {
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+/* Dark mode support */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

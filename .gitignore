@@ -1,4 +1,71 @@
-venv/
-__pycache__/
-*.pyc
+# ==========================================
+# 🛑 ENV & SENSITIVE DATA
+# ==========================================
+# Block all environment files containing secrets
 .env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Allow the safe template to be tracked by Git
+!.env.example
+
+# ==========================================
+# 🐍 FASTAPI / PYTHON BACKEND
+# ==========================================
+# Python byte-code and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# ==========================================
+# ⚛️ REACTJS / NODE FRONTEND
+# ==========================================
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing and Cache
+.eslintcache
+.stylelintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production Build outputs (React/Vite/CRA)
+dist/
+build/
+out/
+
+# ==========================================
+# 💻 SYSTEM & IDE JUNK
+# ==========================================
+# Operating Systems
+.DS_Store
+Thumbs.db
+
+# Editors (VS Code / JetBrains)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
