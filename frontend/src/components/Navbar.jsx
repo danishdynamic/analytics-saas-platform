@@ -1,10 +1,10 @@
+// src/components/Navbar.jsx
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore.js'
 import { useCartStore } from '../store/cartStore.js'
 import { useNotificationStore } from '../store/notificationStore.js'
 import { useThemeStore } from '../store/themeStore.js'
-import { ShoppingCart, Bell, LogOut, User, BarChart3, Package, Store, Menu, X, Sun, Moon } from 'lucide-react'
-import { useState } from 'react'
+import { ShoppingCart, Sun, Moon, LogIn, LogOut, User, Bell, BarChart3, Package, Store } from 'lucide-react'
 
 export default function Navbar() {
   const { isAuth, user, logout } = useAuthStore()
@@ -13,75 +13,77 @@ export default function Navbar() {
   const { theme, toggle } = useThemeStore()
   const navigate = useNavigate()
   const loc = useLocation()
-  const [menuOpen, setMenuOpen] = useState(false)
 
-  const navLink = (to, label, icon) => (
+  const navLink = (to, label, icon, badge = null) => (
     <Link
       key={to}
       to={to}
-      className={`btn btn-sm btn-ghost ${loc.pathname === to ? 'btn-active' : ''}`}
-      onClick={() => setMenuOpen(false)}
+      className={`btn btn-sm btn-ghost gap-2 ${loc.pathname === to ? 'btn-active' : ''}`}
     >
       {icon}
-      <span className="hidden lg:inline ml-1">{label}</span>
+      <span>{label}</span>
+      {badge && <span className="badge badge-xs badge-error">{badge}</span>}
     </Link>
   )
 
   return (
-    <nav className="navbar bg-base-100 shadow-sm sticky top-0 z-50">
+    <nav className="navbar bg-base-100 shadow-sm sticky top-0 z-50 px-4">
+      {/* Logo */}
       <div className="navbar-start">
         <Link to="/" className="btn btn-ghost text-xl font-bold text-primary">SaaS</Link>
       </div>
 
+      {/* Center Navigation - Desktop */}
       <div className="navbar-center hidden md:flex gap-1">
         {navLink('/shop', 'Shop', <Store size={16} />)}
-        {navLink('/cart', `Cart (${count()})`, <ShoppingCart size={16} />)}
+        {navLink('/cart', 'Cart', <ShoppingCart size={16} />, count() > 0 ? count() : null)}
+        
         {isAuth && (
           <>
-            {navLink('/orders', 'Orders', <Package size={16} />)}
             {navLink('/dashboard', 'Dashboard', <BarChart3 size={16} />)}
-            {navLink('/notifications', `Alerts (${unread})`, <Bell size={16} />)}
+            {navLink('/orders', 'Orders', <Package size={16} />)}
+            {navLink('/notifications', 'Alerts', <Bell size={16} />, unread > 0 ? unread : null)}
           </>
         )}
       </div>
 
+      {/* Right Side */}
       <div className="navbar-end gap-2">
-        <button onClick={toggle} className="btn btn-ghost btn-sm btn-circle">
+        {/* Theme Toggle */}
+        <button onClick={toggle} className="btn btn-ghost btn-circle btn-sm">
           {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
         </button>
 
+        {/* Cart - Mobile */}
+        <Link to="/cart" className="btn btn-ghost btn-circle btn-sm md:hidden">
+          <div className="indicator">
+            <ShoppingCart size={18} />
+            {count() > 0 && <span className="badge badge-xs badge-primary indicator-item">{count()}</span>}
+          </div>
+        </Link>
+
+        {/* Auth */}
         {isAuth ? (
           <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="btn btn-ghost btn-sm">
-              <User size={16} />
+            <div tabIndex={0} role="button" className="btn btn-ghost btn-sm gap-2">
+              <div className="avatar placeholder">
+                <div className="bg-primary text-primary-content rounded-full w-8">
+                  <span className="text-xs">{user?.email?.[0]?.toUpperCase()}</span>
+                </div>
+              </div>
               <span className="hidden sm:inline">{user?.email}</span>
             </div>
             <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow">
+              <li className="menu-title">{user?.email}</li>
               <li><button onClick={() => { logout(); navigate('/login') }}><LogOut size={14} /> Logout</button></li>
             </ul>
           </div>
         ) : (
-          <Link to="/login" className="btn btn-primary btn-sm">Login</Link>
+          <Link to="/login" className="btn btn-primary btn-sm gap-2">
+            <LogIn size={14} /> Login
+          </Link>
         )}
-
-        <button className="btn btn-ghost btn-sm md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
       </div>
-
-      {menuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-base-100 shadow-lg p-4 flex flex-col gap-2 z-40">
-          {navLink('/shop', 'Shop', <Store size={16} />)}
-          {navLink('/cart', `Cart (${count()})`, <ShoppingCart size={16} />)}
-          {isAuth && (
-            <>
-              {navLink('/orders', 'Orders', <Package size={16} />)}
-              {navLink('/dashboard', 'Dashboard', <BarChart3 size={16} />)}
-              {navLink('/notifications', `Alerts (${unread})`, <Bell size={16} />)}
-            </>
-          )}
-        </div>
-      )}
     </nav>
   )
 }
