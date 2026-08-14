@@ -3,6 +3,15 @@
 > A production grade, full stack monorepo featuring a high performance FastAPI backend coupled with a modern React + Vite frontend. Built for real time analytics tracking, background job processing, and scalable e commerce workflows.
 
 ---
+## Demo
+
+![Analytics](public/../frontend/public/Screenshot_analytics.png)
+
+![Cart](public/../frontend/public/Screenshot_cart.png)
+
+![Notification](public/../frontend/public/Screenshot_notifications.png)
+
+---
 
 ## 🛠️ Tech Stack & Shields
 

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { API } from '../api/axios.js'
+import  API  from '../api/axios.js'
 import { useAuthStore } from '../store/authStore.js'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Activity, Calendar, TrendingUp, Zap, ShoppingBag, Package, Bell } from 'lucide-react'
