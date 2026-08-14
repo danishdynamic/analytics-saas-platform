@@ -7,9 +7,15 @@
 
 ![Analytics](public/../frontend/public/Screenshot_analytics.png)
 
-![Cart](public/../frontend/public/Screenshot_cart.png)
 
-![Notification](public/../frontend/public/Screenshot_notifications.png)
+
+
+
+
+| Cart | Notification |
+| :---: | :---: |
+| ![Cart](public/../frontend/public/Screenshot_cart.png) |![Notification](public/../frontend/public/Screenshot_notifications.png)|
+
 
 ---
 
