@@ -1,6 +1,3 @@
-from backend.app.models.base import Base
-from backend.app.models.user import User
-from backend.app.models.billing import Billing
-from backend.app.models.notification import Notification
+from sqlalchemy.ext.declarative import declarative_base
 
-# Import models so Alembic can detect them
+Base = declarative_base()

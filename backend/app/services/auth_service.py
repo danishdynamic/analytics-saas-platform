@@ -10,8 +10,11 @@ class AuthService:
         existing = db.query(User).filter(User.email == user.email).first()
         if existing:
             raise ValueError("User already exists")
+
+        # Truncate password to 72 bytes (bcrypt limit)
+        password = user.password[:72]
         
-        hashed_password = get_password_hash(user.password)
+        hashed_password = get_password_hash(password)
         db_user = User(email=user.email, hashed_password=hashed_password)
         db.add(db_user)
         db.commit()
@@ -21,11 +24,17 @@ class AuthService:
         refresh_token = create_refresh_token({"sub": db_user.email, "user_id": db_user.id})
         return Token(access_token=access_token, refresh_token=refresh_token)
     
-    def login(self, db: Session, user: UserLogin) -> Token:
+    def login(self, db, user):
         db_user = db.query(User).filter(User.email == user.email).first()
-        if not db_user or not verify_password(user.password, db_user.hashed_password):
+        if not db_user:
+            raise ValueError("Invalid credentials")
+        
+        # Truncate password to 72 bytes
+        password = user.password[:72]
+        
+        if not verify_password(password, db_user.hashed_password):
             raise ValueError("Invalid credentials")
         
         access_token = create_access_token({"sub": db_user.email, "user_id": db_user.id})
         refresh_token = create_refresh_token({"sub": db_user.email, "user_id": db_user.id})
-        return Token(access_token=access_token, refresh_token=refresh_token)
+        return {"access_token": access_token, "refresh_token": refresh_token}

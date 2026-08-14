@@ -1,17 +1,29 @@
-import { useAnalytics } from '../hooks/useAnalytics.js'
 import { useQuery } from '@tanstack/react-query'
-import  API  from '../api/axios.js'
+import { useNavigate } from 'react-router-dom'
+import { API } from '../api/axios.js'
+import { useAuthStore } from '../store/authStore.js'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Activity, Calendar, TrendingUp, Zap, ShoppingBag, Users, MousePointer } from 'lucide-react'
+import { Activity, Calendar, TrendingUp, Zap, ShoppingBag, Package, Bell } from 'lucide-react'
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6']
 
 export default function Dashboard() {
-  const { stats, events, isLoading } = useAnalytics()
+  const navigate = useNavigate()
+  const { isAuth } = useAuthStore()
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: () => API.get('/api/v1/analytics/dashboard').then((r) => r.data),
+  })
+
+  const { data: eventsData } = useQuery({
+    queryKey: ['events'],
+    queryFn: () => API.get('/api/v1/events/').then((r) => r.data),
+  })
 
   const { data: ordersData } = useQuery({
     queryKey: ['orders-quick'],
     queryFn: () => API.get('/api/v1/orders/').then((r) => r.data),
+    enabled: isAuth,
   })
 
   if (isLoading) {
@@ -22,13 +34,22 @@ export default function Dashboard() {
     )
   }
 
-  const byType = stats.events_by_type
-    ? Object.entries(stats.events_by_type).map(([name, value]) => ({ name, value }))
-    : []
-
-  const recent = events.slice(0, 10)
+  const byType = stats?.events_by_type ? Object.entries(stats.events_by_type).map(([name, value]) => ({ name, value })) : []
+  const recent = eventsData?.slice(0, 8) || []
   const totalOrders = ordersData?.length || 0
   const totalRevenue = ordersData?.reduce((s, o) => s + o.total_amount, 0) || 0
+
+  // Format event properties for human readable display
+  const formatProperties = (props) => {
+    if (!props || Object.keys(props).length === 0) return '-'
+    const parts = []
+    if (props.product_name) parts.push(`Added: ${props.product_name}`)
+    if (props.total) parts.push(`Total: $${props.total}`)
+    if (props.order_id) parts.push(`Order #${props.order_id}`)
+    if (props.product_id) parts.push(`Product #${props.product_id}`)
+    if (parts.length === 0) return Object.values(props).join(', ')
+    return parts.join(' • ')
+  }
 
   return (
     <div>
@@ -45,8 +66,8 @@ export default function Dashboard() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard icon={<Activity size={18} />} label="Total Events" value={stats.total_events || 0} color="primary" />
-        <StatCard icon={<Calendar size={18} />} label="Today" value={stats.today_events || 0} color="success" />
+        <StatCard icon={<Activity size={18} />} label="Total Events" value={stats?.total_events || 0} color="primary" />
+        <StatCard icon={<Calendar size={18} />} label="Today" value={stats?.today_events || 0} color="success" />
         <StatCard icon={<ShoppingBag size={18} />} label="Orders" value={totalOrders} color="secondary" />
         <StatCard icon={<TrendingUp size={18} />} label="Revenue" value={`$${totalRevenue.toFixed(0)}`} color="accent" />
       </div>
@@ -66,12 +87,9 @@ export default function Dashboard() {
                   <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            ) : (
-              <EmptyState text="No event data yet" />
-            )}
+            ) : <EmptyState text="No event data yet" />}
           </div>
         </div>
-
         <div className="card bg-base-100 shadow-sm">
           <div className="card-body">
             <h3 className="card-title text-sm">Distribution</h3>
@@ -87,9 +105,7 @@ export default function Dashboard() {
                   <Tooltip contentStyle={{ background: 'var(--b1)', border: '1px solid var(--b3)', borderRadius: '8px' }} />
                 </PieChart>
               </ResponsiveContainer>
-            ) : (
-              <EmptyState text="No distribution data" />
-            )}
+            ) : <EmptyState text="No distribution data" />}
           </div>
         </div>
       </div>
@@ -120,8 +136,8 @@ export default function Dashboard() {
                         <span className="badge badge-primary badge-sm">{e.event_type}</span>
                       </td>
                       <td className="px-4 py-2 text-sm text-base-content/60">{e.user_id || 'Guest'}</td>
-                      <td className="px-4 py-2 text-xs text-base-content/50 max-w-[150px] truncate">
-                        {JSON.stringify(e.properties)}
+                      <td className="px-4 py-2 text-xs text-base-content/70 max-w-[200px] truncate" title={formatProperties(e.properties)}>
+                        {formatProperties(e.properties)}
                       </td>
                       <td className="px-4 py-2 text-xs text-base-content/40">
                         {new Date(e.created_at).toLocaleTimeString()}
@@ -137,19 +153,19 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions - FIXED: use navigate instead of window.location */}
         <div className="card bg-base-100 shadow-sm">
           <div className="card-body">
             <h3 className="card-title text-sm">Quick Actions</h3>
             <div className="space-y-2 mt-2">
-              <button onClick={() => window.location.href = '/shop'} className="btn btn-primary btn-sm w-full gap-2">
+              <button onClick={() => navigate('/shop')} className="btn btn-primary btn-sm w-full gap-2">
                 <ShoppingBag size={14} /> Browse Shop
               </button>
-              <button onClick={() => window.location.href = '/orders'} className="btn btn-outline btn-sm w-full gap-2">
-                <Users size={14} /> View Orders
+              <button onClick={() => navigate('/orders')} className="btn btn-outline btn-sm w-full gap-2">
+                <Package size={14} /> View Orders
               </button>
-              <button onClick={() => window.location.href = '/notifications'} className="btn btn-outline btn-sm w-full gap-2">
-                <MousePointer size={14} /> Check Alerts
+              <button onClick={() => navigate('/notifications')} className="btn btn-outline btn-sm w-full gap-2">
+                <Bell size={14} /> Check Alerts
               </button>
             </div>
           </div>

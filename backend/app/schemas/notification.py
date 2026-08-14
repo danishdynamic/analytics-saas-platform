@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
 
@@ -9,6 +9,8 @@ class NotificationCreate(BaseModel):
     channel: str = "in_app"
 
 class NotificationRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     user_id: int
     title: str
@@ -17,6 +19,3 @@ class NotificationRead(BaseModel):
     status: str
     created_at: datetime
     sent_at: Optional[datetime] = None
-    
-    class Config:
-        orm_mode = True

@@ -42,7 +42,11 @@ export default function Navbar() {
           <>
             {navLink('/dashboard', 'Dashboard', <BarChart3 size={16} />)}
             {navLink('/orders', 'Orders', <Package size={16} />)}
-            {navLink('/notifications', 'Alerts', <Bell size={16} />, unread > 0 ? unread : null)}
+            <Link to="/notifications" className={`btn btn-sm btn-ghost gap-2 ${loc.pathname === '/notifications' ? 'btn-active' : ''}`}>
+              <Bell size={16} />
+              <span>Alerts</span>
+              {unread > 0 && <span className="badge badge-sm badge-error">{unread}</span>}
+            </Link>
           </>
         )}
       </div>

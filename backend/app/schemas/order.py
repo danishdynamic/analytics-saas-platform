@@ -1,7 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import List, Dict, Any
-from typing import Optional
 
 class OrderItem(BaseModel):
     product_id: int
@@ -14,12 +13,11 @@ class OrderCreate(BaseModel):
     total_amount: float
 
 class OrderRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     user_id: int
     total_amount: float
     status: str
     items: List[Dict[str, Any]]
     created_at: datetime
-    
-    class Config:
-        orm_mode = True
